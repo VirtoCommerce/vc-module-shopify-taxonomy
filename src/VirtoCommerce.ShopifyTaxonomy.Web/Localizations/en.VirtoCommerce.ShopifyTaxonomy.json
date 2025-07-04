@@ -1,8 +1,22 @@
 {
   "ShopifyTaxonomy": {
     "blades": {
-      "hello-world": {
-        "title": "Hello world blade"
+      "import-blade": {
+        "title": "Shopify Taxonomy Import",
+        "labels": {
+          "start-import": "Start Import"
+        }
+      },
+      "import-progress": {
+        "title": "Importing Shopify Taxonomy",
+        "labels": {
+          "start": "Start",
+          "end": "End",
+          "total": "Total count",
+          "processed": "Processed count",
+          "errors-count": "Error count",
+          "errors": "Errors"
+        }
       }
     }
   },

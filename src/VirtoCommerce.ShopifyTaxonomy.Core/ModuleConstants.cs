@@ -9,11 +9,11 @@ public static class ModuleConstants
     {
         public static class General
         {
-            public static SettingDescriptor ShopifyTaxonomyEnabled { get; } = new()
+            public static SettingDescriptor ShopifyTaxonomyMainFileUrl { get; } = new()
             {
-                Name = "ShopifyTaxonomy.Enabled",
-                GroupName = "ShopifyTaxonomy|General",
-                ValueType = SettingValueType.Boolean,
+                Name = "ShopifyTaxonomy.ShopifyTaxonomyFileUrl",
+                GroupName = "ShopifyTaxonomyImport|General",
+                ValueType = SettingValueType.ShortText,
                 DefaultValue = false,
             };
 
@@ -21,7 +21,7 @@ public static class ModuleConstants
             {
                 get
                 {
-                    yield return ShopifyTaxonomyEnabled;
+                    yield return ShopifyTaxonomyMainFileUrl;
                 }
             }
         }
