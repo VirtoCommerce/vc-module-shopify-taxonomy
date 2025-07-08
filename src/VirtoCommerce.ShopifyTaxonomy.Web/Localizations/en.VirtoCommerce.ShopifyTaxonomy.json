@@ -4,7 +4,9 @@
       "import-blade": {
         "title": "Shopify Taxonomy Import",
         "labels": {
-          "start-import": "Start Import"
+          "start-import": "Start Import",
+          "import-properties": "Import Properties",
+          "import-localizations": "Import Localizations"
         }
       },
       "import-progress": {

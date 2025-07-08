@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using VirtoCommerce.CatalogModule.Core.Model;
 using VirtoCommerce.CatalogModule.Core.Services;
+using VirtoCommerce.Platform.Core.Common;
 using VirtoCommerce.Platform.Core.ExportImport;
 using VirtoCommerce.Platform.Core.PushNotifications;
 using VirtoCommerce.ShopifyTaxonomy.Core.Common;
@@ -71,7 +72,7 @@ namespace VirtoCommerce.ShopifyTaxonomy.Data.Services
             }
         }
 
-        public async Task ImportAsync(ShopifyTaxonomyImportRequest importInfo, Action<ExportImportProgressInfo> progressCallback)
+        public async Task ImportAsync(ShopifyTaxonomyImportRequest importRequest, Action<ExportImportProgressInfo> progressCallback)
         {
             var progressInfo = new ExportImportProgressInfo
             {
@@ -79,15 +80,22 @@ namespace VirtoCommerce.ShopifyTaxonomy.Data.Services
             };
             progressCallback(progressInfo);
 
-            // languages?
-            var catalogId = importInfo.CatalogId;
+            var catalogId = importRequest.CatalogId;
 
-            using var stream = await DownloadMainTaxonomyFileAsync();
+            // find languages
+            var catalog = await _catalogService.GetNoCloneAsync(catalogId);
+            var defaultLangugae = catalog.DefaultLanguage.LanguageCode;
+            var mainTaxonomyFileUrl = GetTaxonomyFileUrl(defaultLangugae);
+
+            progressInfo.Description = "Downloading main taxonomy file";
+            progressCallback(progressInfo);
+
+            using var stream = await DownloadMainTaxonomyFileAsync(mainTaxonomyFileUrl);
             using var reader = new StreamReader(stream);
             using var jsonReader = new JsonTextReader(reader);
 
             var serializer = new JsonSerializer();
-            var taxonomy = serializer.Deserialize<ShopifyTaxonomy.Core.Models.ShopifyTaxonomy>(jsonReader);
+            var taxonomy = serializer.Deserialize<Core.Models.ShopifyTaxonomy>(jsonReader);
 
             if (taxonomy?.Verticals == null || !taxonomy.Verticals.Any())
             {
@@ -100,7 +108,75 @@ namespace VirtoCommerce.ShopifyTaxonomy.Data.Services
             var groups = shopifyCategories.GroupBy(x => x.Level);
             var categories = new List<Category>();
 
-            progressInfo.TotalCount = shopifyCategories.Count;
+            progressInfo.TotalCount = importRequest.ImportProperties
+                ? shopifyCategories.Count + taxonomy.Attributes.Count
+                : shopifyCategories.Count;
+
+            var localizations = new List<LocalizedTaxonomyResource>();
+            if (importRequest.ImportLocalizations)
+            {
+                // download all taxonomy files and create localization maps
+                var langugages = catalog.Languages.Select(x => x.LanguageCode).Where(x => !x.EqualsIgnoreCase(defaultLangugae));
+
+                foreach (var langugage in langugages)
+                {
+                    var taxonomyFileUrl = GetTaxonomyFileUrl(langugage);
+                    if (taxonomyFileUrl != null)
+                    {
+                        localizations.Add(new LocalizedTaxonomyResource
+                        {
+                            CultureName = langugage,
+                            TaxonomyFileUrl = taxonomyFileUrl,
+                        });
+                    }
+                }
+
+                foreach (var localization in localizations)
+                {
+                    var cultureName = localization.CultureName;
+                    var fileUrl = localization.TaxonomyFileUrl;
+
+                    using (var localizationFileStream = await DownloadMainTaxonomyFileAsync(fileUrl))
+                    {
+                        progressInfo.Description = $"Downloading localization file for {cultureName}";
+                        progressCallback(progressInfo);
+
+                        using (var localizationFileReader = new StreamReader(localizationFileStream))
+                        {
+                            using (var localizedJsonReader = new JsonTextReader(localizationFileReader))
+                            {
+                                var localizedTaxonomy = serializer.Deserialize<Core.Models.ShopifyTaxonomy>(localizedJsonReader);
+
+                                // category localizations
+                                // Merge localized taxonomy into main taxonomy
+                                foreach (var vertical in localizedTaxonomy.Verticals)
+                                {
+                                    foreach (var category in vertical.Categories)
+                                    {
+                                        // Find the corresponding category in the main taxonomy
+                                        var mainCategory = shopifyCategories.FirstOrDefault(c => c.Id == category.Id);
+
+                                        if (mainCategory != null)
+                                        {
+                                            mainCategory.LocalizedName ??= new LocalizedString();
+                                            mainCategory.LocalizedName.Values.TryAdd(localization.CultureName, category.Name); // Add localized name
+                                        }
+                                    }
+                                }
+
+                                // property and property values localizations
+                                if (importRequest.ImportProperties)
+                                {
+                                    localization.Attributes = localizedTaxonomy.Attributes;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            progressInfo.Description = "Processing categories";
+            progressCallback(progressInfo);
 
             // First pass - create categories
             foreach (var group in groups)
@@ -110,12 +186,17 @@ namespace VirtoCommerce.ShopifyTaxonomy.Data.Services
                 for (var i = 0; i < categoryLevel.Count; i += PageSize)
                 {
                     var batch = categoryLevel.Skip(i).Take(PageSize);
-                    var processedCategories = await ProcessCategoryBatch(batch, catalogId, outerIdsToCategoryIdsMap);
+                    var processedCategories = await ProcessCategoryBatch(batch, catalogId, outerIdsToCategoryIdsMap, defaultLangugae);
                     categories.AddRange(processedCategories);
 
                     progressInfo.ProcessedCount += processedCategories.Count;
                     progressCallback(progressInfo);
                 }
+            }
+
+            if (!importRequest.ImportProperties)
+            {
+                return;
             }
 
             // Second pass - process attribute mapping and inheritance
@@ -171,6 +252,7 @@ namespace VirtoCommerce.ShopifyTaxonomy.Data.Services
                         Name = shopifyAttribute.Handle.Replace('-', '_'),
                         OuterId = shopifyAttribute.Id,
                         Dictionary = true,
+                        Multilanguage = true,
                         Multivalue = false,
                         ValueType = PropertyValueType.ShortText,
                         Type = PropertyType.Product,
@@ -190,7 +272,7 @@ namespace VirtoCommerce.ShopifyTaxonomy.Data.Services
                     {
                         new PropertyDisplayName
                         {
-                            LanguageCode = "en-US",
+                            LanguageCode = defaultLangugae,
                             Name = shopifyAttribute.Name,
                         }
                     };
@@ -202,19 +284,59 @@ namespace VirtoCommerce.ShopifyTaxonomy.Data.Services
                         var value = new PropertyDictionaryItem
                         {
                             Alias = shopifyValue.Handle,
-                            LocalizedValues = new[]
+                            LocalizedValues = new List<PropertyDictionaryItemLocalizedValue>
                                 {
-                                    new PropertyDictionaryItemLocalizedValue { LanguageCode = "en-US", Value = shopifyValue.Name,  },
+                                    new PropertyDictionaryItemLocalizedValue
+                                    {
+                                        LanguageCode = defaultLangugae,
+                                        Value = shopifyValue.Name,
+                                    },
                                 },
                         };
 
                         dictionaryItems.Add(value);
                     }
 
+                    // localizations
+                    if (importRequest.ImportLocalizations)
+                    {
+                        foreach (var localization in localizations)
+                        {
+                            var localizedAttribue = localization.Attributes.FirstOrDefault(x => x.Id == shopifyAttribute.Id);
+                            if (localizedAttribue != null)
+                            {
+                                var localizedName = new PropertyDisplayName
+                                {
+                                    LanguageCode = localization.CultureName,
+                                    Name = localizedAttribue.Name,
+                                };
+                                property.DisplayNames.Add(localizedName);
+
+                                // dictionary values
+                                foreach (var dictionaryItem in dictionaryItems)
+                                {
+                                    var shopifyLocalizedValue = localizedAttribue.Values?.FirstOrDefault(x => x.Handle == dictionaryItem.Alias);
+                                    if (shopifyLocalizedValue != null)
+                                    {
+                                        var localizedItemValue = new PropertyDictionaryItemLocalizedValue
+                                        {
+                                            LanguageCode = localization.CultureName,
+                                            Value = shopifyLocalizedValue.Name,
+                                        };
+                                        dictionaryItem.LocalizedValues.Add(localizedItemValue);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     properties.Add(property);
                     propertyItemsMaps.Add(shopifyAttribute.Id, dictionaryItems);
                 }
             }
+
+            progressInfo.Description = "Processing attributes";
+            progressCallback(progressInfo);
 
             for (var i = 0; i < properties.Count; i += PageSize)
             {
@@ -235,10 +357,13 @@ namespace VirtoCommerce.ShopifyTaxonomy.Data.Services
                         await _propertyDictionaryItemService.SaveChangesAsync(dictionaryItems);
                     }
                 }
+
+                progressInfo.ProcessedCount += batch.Count;
+                progressCallback(progressInfo);
             }
         }
 
-        private async Task<List<Category>> ProcessCategoryBatch(IEnumerable<ShopifyCategory> shopifyCategories, string catalogId, Dictionary<string, string> outerIdsToCategoryIdsMap)
+        private async Task<List<Category>> ProcessCategoryBatch(IEnumerable<ShopifyCategory> shopifyCategories, string catalogId, Dictionary<string, string> outerIdsToCategoryIdsMap, string defaultLanguage)
         {
             var categories = new List<Category>();
             foreach (var shopifyCategory in shopifyCategories)
@@ -252,6 +377,11 @@ namespace VirtoCommerce.ShopifyTaxonomy.Data.Services
                     IsActive = true,
                     CatalogId = catalogId,
                 };
+
+                var localizations = shopifyCategory.LocalizedName?.GetCopy() as LocalizedString;
+                localizations ??= new LocalizedString();
+                localizations.Values.TryAdd(defaultLanguage, shopifyCategory.Name);
+                category.LocalizedName = localizations;
 
                 // Set parent if exists
                 if (!string.IsNullOrEmpty(shopifyCategory.ParentId))
@@ -276,11 +406,9 @@ namespace VirtoCommerce.ShopifyTaxonomy.Data.Services
             return categories;
         }
 
-        public async Task<Stream> DownloadMainTaxonomyFileAsync()
+        public async Task<Stream> DownloadMainTaxonomyFileAsync(string fileUrl)
         {
             var client = _httpClientFactory.CreateClient();
-
-            var fileUrl = "https://raw.githubusercontent.com/Shopify/product-taxonomy/refs/heads/main/dist/en/taxonomy.json";
 
             var response = await client.GetAsync(fileUrl);
             if (!response.IsSuccessStatusCode)
@@ -296,5 +424,69 @@ namespace VirtoCommerce.ShopifyTaxonomy.Data.Services
         {
             public Category Category { get; set; } // Null category means use Catalog as container - skip finding common ancestor then
         }
+
+        private class LocalizedTaxonomyResource
+        {
+            public string CultureName { get; set; }
+
+            public string TaxonomyFileUrl { get; set; }
+
+            // Properties and values
+            public List<ShopifyAttribute> Attributes { get; set; }
+        }
+
+        private string GetTaxonomyFileUrl(string cultureName)
+        {
+            var result = default(string);
+
+            var language = cultureName.Split('-', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+
+            if (language.Length > 0)
+            {
+                var availableLanguage = Languages.FirstOrDefault(x => x.EqualsIgnoreCase(language[0]));
+                availableLanguage ??= Languages.FirstOrDefault(x => x.EqualsIgnoreCase(cultureName));
+
+                if (availableLanguage != null)
+                {
+                    result = $"https://raw.githubusercontent.com/Shopify/product-taxonomy/refs/heads/main/dist/{availableLanguage}/taxonomy.json";
+                }
+            }
+
+            return result;
+        }
+
+        private List<string> Languages => [
+            "bg-BG", // Bulgarian
+            "cs",    // Czech
+            "da",    // Danish
+            "de",    // German
+            "el",    // Greek
+            "en",    // English
+            "es",    // Spanish
+            "fi",    // Finnish
+            "fr",    // French
+            "hr-HR", // Croatian
+            "hu",    // Hungarian
+            "id-ID", // Indonesian
+            "it",    // Italian
+            "ja",    // Japanese
+            "ko",    // Korean
+            "lt-LT", // Lithuanian
+            "nb",    // Norwegian
+            "nl",    // Dutch
+            "pl",    // Polish
+            "pt-BR", // Portuguese (Brazil)
+            "pt-PT", // Portuguese (Portugal)
+            "ro-RO", // Romanian
+            "ru",    // Russian
+            "sk-SK", // Slovak
+            "sl-SI", // Slovenian
+            "sv",    // Swedish
+            "th",    // Thai
+            "tr",    // Turkish
+            "vi",    // Vietnamese
+            "zh-CN", // Chinese (Simplified)
+            "zh-TW", // Chinese (Traditional)
+        ];
     }
 }

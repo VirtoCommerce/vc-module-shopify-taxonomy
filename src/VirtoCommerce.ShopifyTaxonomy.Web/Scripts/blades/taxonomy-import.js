@@ -6,6 +6,7 @@ angular.module('VirtoCommerce.ShopifyTaxonomy')
 
             blade.refresh = function () {
                 blade.importProperties = true;
+                blade.importLocalizations = true;
 
                 blade.isLoading = false;
             };
@@ -13,7 +14,8 @@ angular.module('VirtoCommerce.ShopifyTaxonomy')
             $scope.startImport = function () {
                 var request = {
                     catalogId: blade.catalog.id,
-                    importProperties: blade.importProperties
+                    importProperties: blade.importProperties,
+                    importLocalizations: blade.importLocalizations
                 };
                 api.importTaxonomy(request, function (notification) {
                     var newBlade = {
@@ -31,8 +33,7 @@ angular.module('VirtoCommerce.ShopifyTaxonomy')
                     });
 
                     blade.canImport = false;
-                    bladeNavigationService.showBlade(newBlade, blade);
-                    $scope.bladeClose();
+                    bladeNavigationService.showBlade(newBlade, blade.parentBlade);
                 }, function (error) {
                     bladeNavigationService.setError('Error ' + error.status, blade);
                 });

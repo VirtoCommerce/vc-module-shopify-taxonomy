@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using VirtoCommerce.Platform.Core.Common;
 
 namespace VirtoCommerce.ShopifyTaxonomy.Core.Models;
 
@@ -43,6 +44,8 @@ public class ShopifyCategory
 
     [JsonProperty("ancestors")]
     public List<ShopifyCategoryAncestor> Ancestors { get; set; }
+
+    public LocalizedString LocalizedName { get; set; }
 }
 
 public class ShopifyCategoryAttribute
