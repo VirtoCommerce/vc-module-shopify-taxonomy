@@ -263,7 +263,7 @@ namespace VirtoCommerce.ShopifyTaxonomy.Data.Services
 
                 // values
                 var dictionaryItems = new List<PropertyDictionaryItem>();
-                foreach (var shopifyValue in shopifyAttribute.Values ?? [])
+                foreach (var shopifyValue in shopifyAttribute.Values)
                 {
                     var value = new PropertyDictionaryItem
                     {
@@ -284,47 +284,56 @@ namespace VirtoCommerce.ShopifyTaxonomy.Data.Services
                 result.Properties.Add(property);
                 result.PropertyItemsMaps.Add(shopifyAttribute.Id, dictionaryItems);
 
-                // localizations
-                if (!importRequest.ImportLocalizations)
+                ProcessPropertyLocalization(importRequest, localizations, shopifyAttribute, property, dictionaryItems);
+            }
+
+            return result;
+        }
+
+        private static void ProcessPropertyLocalization(
+            ShopifyTaxonomyImportRequest importRequest,
+            List<LocalizedTaxonomyResource> localizations,
+            ShopifyAttribute shopifyAttribute,
+            Property property,
+            List<PropertyDictionaryItem> dictionaryItems)
+        {
+            if (!importRequest.ImportLocalizations)
+            {
+                return;
+            }
+
+            foreach (var localization in localizations)
+            {
+                var localizedAttribue = localization.Attributes.FirstOrDefault(x => x.Id == shopifyAttribute.Id);
+                if (localizedAttribue == null)
                 {
                     continue;
                 }
 
-                foreach (var localization in localizations)
+                var localizedName = new PropertyDisplayName
                 {
-                    var localizedAttribue = localization.Attributes.FirstOrDefault(x => x.Id == shopifyAttribute.Id);
-                    if (localizedAttribue == null)
+                    LanguageCode = localization.CultureName,
+                    Name = localizedAttribue.Name,
+                };
+                property.DisplayNames.Add(localizedName);
+
+                // dictionary values
+                foreach (var dictionaryItem in dictionaryItems)
+                {
+                    var shopifyLocalizedValue = localizedAttribue.Values?.FirstOrDefault(x => x.Handle == dictionaryItem.Alias);
+                    if (shopifyLocalizedValue == null)
                     {
                         continue;
                     }
 
-                    var localizedName = new PropertyDisplayName
+                    var localizedItemValue = new PropertyDictionaryItemLocalizedValue
                     {
                         LanguageCode = localization.CultureName,
-                        Name = localizedAttribue.Name,
+                        Value = shopifyLocalizedValue.Name,
                     };
-                    property.DisplayNames.Add(localizedName);
-
-                    // dictionary values
-                    foreach (var dictionaryItem in dictionaryItems)
-                    {
-                        var shopifyLocalizedValue = localizedAttribue.Values?.FirstOrDefault(x => x.Handle == dictionaryItem.Alias);
-                        if (shopifyLocalizedValue == null)
-                        {
-                            continue;
-                        }
-
-                        var localizedItemValue = new PropertyDictionaryItemLocalizedValue
-                        {
-                            LanguageCode = localization.CultureName,
-                            Value = shopifyLocalizedValue.Name,
-                        };
-                        dictionaryItem.LocalizedValues.Add(localizedItemValue);
-                    }
+                    dictionaryItem.LocalizedValues.Add(localizedItemValue);
                 }
             }
-
-            return result;
         }
 
         private static Dictionary<string, AttributeCategoryWrapper> ProcessAttributeInheritance(List<ShopifyCategory> shopifyCategories, ProcessCatetgoriesResult catetgoriesResult)
