@@ -78,7 +78,7 @@ namespace VirtoCommerce.ShopifyTaxonomy.Data.Services
             _httpClientFactory = httpClientFactory;
         }
 
-        public async Task BackgroundImport(ShopifyTaxonomyImportRequest importInfo, ShopifyTaxonomyImportNotification notifyEvent)
+        public async Task BackgroundImport(ShopifyTaxonomyImportRequest importRequest, ShopifyTaxonomyImportNotification notifyEvent)
         {
             Action<ExportImportProgressInfo> progressCallback = x =>
             {
@@ -92,7 +92,7 @@ namespace VirtoCommerce.ShopifyTaxonomy.Data.Services
 
             try
             {
-                await ImportAsync(importInfo, progressCallback);
+                await ImportAsync(importRequest, progressCallback);
             }
             catch (Exception ex)
             {
@@ -102,7 +102,7 @@ namespace VirtoCommerce.ShopifyTaxonomy.Data.Services
             finally
             {
                 notifyEvent.Finished = DateTime.UtcNow;
-                notifyEvent.Description = "Import finished" + (notifyEvent.Errors.Any() ? " with errors" : " successfully");
+                notifyEvent.Description = "Import finished" + (notifyEvent.Errors.Count != 0 ? " with errors" : " successfully");
                 await _notifier.SendAsync(notifyEvent);
             }
         }
@@ -197,15 +197,17 @@ namespace VirtoCommerce.ShopifyTaxonomy.Data.Services
                 // Save dictionary items
                 foreach (var property in batch)
                 {
-                    if (propertiesResult.PropertyItemsMaps.TryGetValue(property.OuterId, out var dictionaryItems))
+                    if (!propertiesResult.PropertyItemsMaps.TryGetValue(property.OuterId, out var dictionaryItems))
                     {
-                        foreach (var item in dictionaryItems)
-                        {
-                            item.PropertyId = property.Id;
-                        }
-
-                        await _propertyDictionaryItemService.SaveChangesAsync(dictionaryItems);
+                        continue;
                     }
+
+                    foreach (var item in dictionaryItems)
+                    {
+                        item.PropertyId = property.Id;
+                    }
+
+                    await _propertyDictionaryItemService.SaveChangesAsync(dictionaryItems);
                 }
 
                 progressInfo.ProcessedCount += batch.Count;
@@ -444,22 +446,6 @@ namespace VirtoCommerce.ShopifyTaxonomy.Data.Services
                     // category localizations
                     localization.Categories = localizedTaxonomy.Verticals.SelectMany(v => v.Categories).ToList();
 
-                    //// Merge localized taxonomy into main taxonomy
-                    //foreach (var vertical in localizedTaxonomy.Verticals)
-                    //{
-                    //    foreach (var category in vertical.Categories)
-                    //    {
-                    //        // Find the corresponding category in the main taxonomy
-                    //        var mainCategory = shopifyCategories.FirstOrDefault(c => c.Id == category.Id);
-
-                    //        if (mainCategory != null)
-                    //        {
-                    //            mainCategory.LocalizedName ??= new LocalizedString();
-                    //            mainCategory.LocalizedName.Values.TryAdd(localization.CultureName, category.Name); // Add localized name
-                    //        }
-                    //    }
-                    //}
-
                     // property and property values localizations
                     if (importRequest.ImportProperties)
                     {
@@ -496,12 +482,9 @@ namespace VirtoCommerce.ShopifyTaxonomy.Data.Services
                 category.LocalizedName = localizations;
 
                 // Set parent if exists
-                if (!string.IsNullOrEmpty(shopifyCategory.ParentId))
+                if (!string.IsNullOrEmpty(shopifyCategory.ParentId) && outerIdsToCategoryIdsMap.TryGetValue(shopifyCategory.ParentId, out var parentId))
                 {
-                    if (outerIdsToCategoryIdsMap.TryGetValue(shopifyCategory.ParentId, out var parentId))
-                    {
-                        category.ParentId = parentId;
-                    }
+                    category.ParentId = parentId;
                 }
 
                 categories.Add(category);

@@ -13,12 +13,7 @@ public static class CategoryHelper
         var pathToRootB = GetAncestorPath(secondCategoryId, categoryMap);
 
         // Step 3: Find the first ancestor in B's path that exists in A's ancestors
-        foreach (var ancestor in pathToRootB.Where(ancestorsOfA.Contains))
-        {
-            return ancestor;// This is the closest common ancestor
-        }
-
-        return null; // No common ancestor found
+        return pathToRootB.FirstOrDefault(ancestorsOfA.Contains);
     }
 
     private static HashSet<string> GetAncestors(string id, Dictionary<string, Category> categoryMap)
