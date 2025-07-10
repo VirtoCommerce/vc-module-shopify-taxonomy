@@ -353,19 +353,7 @@ namespace VirtoCommerce.ShopifyTaxonomy.Data.Services
                     {
                         if (wrapper.Category != null)
                         {
-                            var first = wrapper.Category;
-                            var second = category;
-                            var lca = CategoryHelper.FindClosestCommonAncestor(categoryMap, first.Id, second.Id);
-
-                            if (lca == null)
-                            {
-                                // No common ancestor found, use the catalog as container
-                                wrapper.Category = null; // Set to null to indicate catalog level
-                            }
-                            else
-                            {
-                                wrapper.Category = categoryMap[lca]; // Set to the common ancestor category
-                            }
+                            wrapper.Category = FindClosestCommonAncestor(categoryMap, wrapper.Category, category);
                         }
                     }
                     else
@@ -381,6 +369,19 @@ namespace VirtoCommerce.ShopifyTaxonomy.Data.Services
             }
 
             return attributeMap;
+        }
+
+        private static Category FindClosestCommonAncestor(Dictionary<string, Category> categoryMap, Category first, Category second)
+        {
+            var cca = CategoryHelper.FindClosestCommonAncestor(categoryMap, first.Id, second.Id);
+
+            if (cca != null)
+            {
+                return categoryMap[cca]; // Set to the common ancestor category
+            }
+
+            // No common ancestor found, use null to indicate catalog as the container
+            return null;
         }
 
         private async Task<ProcessCatetgoriesResult> ProcessCategories(Action<ExportImportProgressInfo> progressCallback,
