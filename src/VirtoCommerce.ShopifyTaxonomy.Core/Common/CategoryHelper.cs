@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using VirtoCommerce.CatalogModule.Core.Model;
 
 namespace VirtoCommerce.ShopifyTaxonomy.Core.Common;
@@ -12,12 +13,9 @@ public static class CategoryHelper
         var pathToRootB = GetAncestorPath(secondCategoryId, categoryMap);
 
         // Step 3: Find the first ancestor in B's path that exists in A's ancestors
-        foreach (var ancestor in pathToRootB)
+        foreach (var ancestor in pathToRootB.Where(ancestorsOfA.Contains))
         {
-            if (ancestorsOfA.Contains(ancestor))
-            {
-                return ancestor; // This is the closest common ancestor
-            }
+            return ancestor;// This is the closest common ancestor
         }
 
         return null; // No common ancestor found

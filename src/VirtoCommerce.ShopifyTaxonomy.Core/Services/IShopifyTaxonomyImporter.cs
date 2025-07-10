@@ -7,6 +7,6 @@ namespace VirtoCommerce.ShopifyTaxonomy.Core.Services;
 
 public interface IShopifyTaxonomyImporter
 {
-    Task BackgroundImport(ShopifyTaxonomyImportRequest importInfo, ShopifyTaxonomyImportNotification notifyEvent);
-    Task ImportAsync(ShopifyTaxonomyImportRequest importInfo, Action<ExportImportProgressInfo> progressCallback);
+    Task BackgroundImport(ShopifyTaxonomyImportRequest importRequest, ShopifyTaxonomyImportNotification notifyEvent);
+    Task ImportAsync(ShopifyTaxonomyImportRequest importRequest, Action<ExportImportProgressInfo> progressCallback);
 }

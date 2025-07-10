@@ -17,17 +17,18 @@ angular.module('VirtoCommerce.ShopifyTaxonomy')
                     importProperties: blade.importProperties,
                     importLocalizations: blade.importLocalizations
                 };
-                api.importTaxonomy(request, function (notification) {
+
+                api.importTaxonomy(request, function (resultNotification) {
                     var newBlade = {
                         id: "taxonomyImportProgress",
                         catalog: blade.catalog,
-                        notification: notification,
+                        notification: resultNotification,
                         controller: 'VirtoCommerce.ShopifyTaxonomy.taxonomyImportProgressController',
                         template: 'Modules/$(VirtoCommerce.ShopifyTaxonomy)/Scripts/blades/taxonomy-import-progress.html'
                     };
 
                     $scope.$on("new-notification-event", function (event, notification) {
-                        if (notification && notification.id == newBlade.notification.id) {
+                        if (notification && notification.id === newBlade.notification.id) {
                             blade.canImport = notification.finished != null;
                         }
                     });
