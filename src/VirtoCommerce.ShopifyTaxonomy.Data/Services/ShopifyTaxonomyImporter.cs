@@ -31,40 +31,6 @@ namespace VirtoCommerce.ShopifyTaxonomy.Data.Services
 
         private const int PageSize = 500;
 
-        private List<string> Languages => [
-            "bg-BG", // Bulgarian
-            "cs",    // Czech
-            "da",    // Danish
-            "de",    // German
-            "el",    // Greek
-            "en",    // English
-            "es",    // Spanish
-            "fi",    // Finnish
-            "fr",    // French
-            "hr-HR", // Croatian
-            "hu",    // Hungarian
-            "id-ID", // Indonesian
-            "it",    // Italian
-            "ja",    // Japanese
-            "ko",    // Korean
-            "lt-LT", // Lithuanian
-            "nb",    // Norwegian
-            "nl",    // Dutch
-            "pl",    // Polish
-            "pt-BR", // Portuguese (Brazil)
-            "pt-PT", // Portuguese (Portugal)
-            "ro-RO", // Romanian
-            "ru",    // Russian
-            "sk-SK", // Slovak
-            "sl-SI", // Slovenian
-            "sv",    // Swedish
-            "th",    // Thai
-            "tr",    // Turkish
-            "vi",    // Vietnamese
-            "zh-CN", // Chinese (Simplified)
-            "zh-TW", // Chinese (Traditional)
-        ];
-
         public ShopifyTaxonomyImporter(
             ICategoryService categoryService,
             IPropertyService propertyService,
