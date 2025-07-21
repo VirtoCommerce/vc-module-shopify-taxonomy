@@ -1,0 +1,37 @@
+{
+  "ShopifyTaxonomy": {
+    "blades": {
+      "import-blade": {
+        "title": "Importazione Tassonomia Shopify",
+        "labels": {
+          "start-import": "Avvia Importazione",
+          "import-properties": "Importa Proprietà",
+          "import-localizations": "Importa Localizzazioni"
+        }
+      },
+      "import-progress": {
+        "title": "Importazione della Tassonomia Shopify",
+        "labels": {
+          "start": "Inizio",
+          "end": "Fine",
+          "total": "Conteggio totale",
+          "processed": "Conteggio elaborato",
+          "errors-count": "Conteggio errori",
+          "errors": "Errori"
+        }
+      }
+    }
+  },
+  "settings": {
+    "ShopifyTaxonomy": {
+      "ShopifyTaxonomyFileUrl": {
+        "title": "URL del file della tassonomia Shopify",
+        "description": "URL del file della tassonomia di Shopify."
+      },
+      "ShopifyTaxonomyLanguagesCodes": {
+        "title": "Codici lingua della tassonomia Shopify",
+        "description": "Elenco dei codici lingua utilizzati da Shopify"
+      }
+    }
+  }
+}

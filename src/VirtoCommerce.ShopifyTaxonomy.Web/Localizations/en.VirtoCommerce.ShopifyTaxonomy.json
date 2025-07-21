@@ -22,18 +22,15 @@
       }
     }
   },
-  "permissions": {
-    "shopify-taxonomy:access": "Open ShopifyTaxonomy menu",
-    "shopify-taxonomy:create": "Create ShopifyTaxonomy related data",
-    "shopify-taxonomy:read": "View ShopifyTaxonomy related data",
-    "shopify-taxonomy:update": "Update ShopifyTaxonomy related data",
-    "shopify-taxonomy:delete": "Delete ShopifyTaxonomy related data"
-  },
   "settings": {
     "ShopifyTaxonomy": {
-      "Enabled": {
-        "title": "ShopifyTaxonomy Enabled",
-        "description": "ShopifyTaxonomy Enabled setting"
+      "ShopifyTaxonomyFileUrl": {
+        "title": "Shopify Taxonomy File URL",
+        "description": "URL to the Shopify Taxonomy file."
+      },
+      "ShopifyTaxonomyLanguagesCodes": {
+        "title": "Shopify Taxonomy Language Codes",
+        "description": "List of language codes used by Shopify"
       }
     }
   }

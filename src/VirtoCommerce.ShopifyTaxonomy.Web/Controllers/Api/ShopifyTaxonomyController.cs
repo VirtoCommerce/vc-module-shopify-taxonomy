@@ -41,8 +41,7 @@ namespace VirtoCommerce.CatalogModule.Web.Controllers.Api
 
         [HttpPost]
         [Route("import")]
-        //[Authorize(Security.Permissions.Import)]
-        //[ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ShopifyTaxonomyImportNotification), StatusCodes.Status200OK)]
 
         public async Task<ActionResult<ShopifyTaxonomyImportNotification>> DoImport([FromBody] ShopifyTaxonomyImportRequest importInfo)

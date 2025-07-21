@@ -11,6 +11,8 @@ using VirtoCommerce.Platform.Core.Common;
 using VirtoCommerce.Platform.Core.Exceptions;
 using VirtoCommerce.Platform.Core.ExportImport;
 using VirtoCommerce.Platform.Core.PushNotifications;
+using VirtoCommerce.Platform.Core.Settings;
+using VirtoCommerce.ShopifyTaxonomy.Core;
 using VirtoCommerce.ShopifyTaxonomy.Core.Common;
 using VirtoCommerce.ShopifyTaxonomy.Core.Models;
 using VirtoCommerce.ShopifyTaxonomy.Core.Services;
@@ -25,6 +27,7 @@ namespace VirtoCommerce.ShopifyTaxonomy.Data.Services
         private readonly IPropertyDictionaryItemService _propertyDictionaryItemService;
         private readonly IPushNotificationManager _notifier;
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly ISettingsManager _settingsManager;
 
         private const int PageSize = 500;
 
@@ -68,7 +71,8 @@ namespace VirtoCommerce.ShopifyTaxonomy.Data.Services
             ICatalogService catalogService,
             IPropertyDictionaryItemService propertyDictionaryItemService,
             IPushNotificationManager notifier,
-            IHttpClientFactory httpClientFactory)
+            IHttpClientFactory httpClientFactory,
+            ISettingsManager settingsManager)
         {
             _categoryService = categoryService;
             _propertyService = propertyService;
@@ -76,6 +80,7 @@ namespace VirtoCommerce.ShopifyTaxonomy.Data.Services
             _propertyDictionaryItemService = propertyDictionaryItemService;
             _notifier = notifier;
             _httpClientFactory = httpClientFactory;
+            _settingsManager = settingsManager;
         }
 
         public async Task BackgroundImport(ShopifyTaxonomyImportRequest importRequest, ShopifyTaxonomyImportNotification notifyEvent)
@@ -120,7 +125,7 @@ namespace VirtoCommerce.ShopifyTaxonomy.Data.Services
             // find languages
             var catalog = await _catalogService.GetNoCloneAsync(catalogId);
             var defaultLangugae = catalog.DefaultLanguage.LanguageCode;
-            var mainTaxonomyFileUrl = GetTaxonomyFileUrl(defaultLangugae);
+            var mainTaxonomyFileUrl = await GetTaxonomyFileUrlAsync(defaultLangugae);
 
             progressInfo.Description = "Downloading main taxonomy file";
             progressCallback(progressInfo);
@@ -427,7 +432,7 @@ namespace VirtoCommerce.ShopifyTaxonomy.Data.Services
 
                 foreach (var langugage in langugages)
                 {
-                    var taxonomyFileUrl = GetTaxonomyFileUrl(langugage);
+                    var taxonomyFileUrl = await GetTaxonomyFileUrlAsync(langugage);
                     if (taxonomyFileUrl != null)
                     {
                         localizations.Add(new LocalizedTaxonomyResource
@@ -525,7 +530,7 @@ namespace VirtoCommerce.ShopifyTaxonomy.Data.Services
             return stream;
         }
 
-        private string GetTaxonomyFileUrl(string cultureName)
+        private async Task<string> GetTaxonomyFileUrlAsync(string cultureName)
         {
             var result = default(string);
 
@@ -533,12 +538,16 @@ namespace VirtoCommerce.ShopifyTaxonomy.Data.Services
 
             if (language.Length > 0)
             {
-                var availableLanguage = Languages.FirstOrDefault(x => x.EqualsIgnoreCase(language[0]));
-                availableLanguage ??= Languages.FirstOrDefault(x => x.EqualsIgnoreCase(cultureName));
+                var settings = await _settingsManager.GetObjectSettingAsync(ModuleConstants.Settings.General.ShopifyTaxonomyLanguagesCodes.Name);
+                var languages = settings.AllowedValues.OfType<string>().ToList();
+
+                var availableLanguage = languages.FirstOrDefault(x => x.EqualsIgnoreCase(language[0]));
+                availableLanguage ??= languages.FirstOrDefault(x => x.EqualsIgnoreCase(cultureName));
 
                 if (availableLanguage != null)
                 {
-                    result = $"https://raw.githubusercontent.com/Shopify/product-taxonomy/refs/heads/main/dist/{availableLanguage}/taxonomy.json";
+                    var fileUrlSetting = await _settingsManager.GetValueAsync<string>(ModuleConstants.Settings.General.ShopifyTaxonomyFileUrl);
+                    result = fileUrlSetting.Replace("{languageCode}", availableLanguage, StringComparison.OrdinalIgnoreCase);
                 }
             }
 

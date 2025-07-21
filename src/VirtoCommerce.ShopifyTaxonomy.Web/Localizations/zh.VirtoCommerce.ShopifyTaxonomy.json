@@ -1,0 +1,37 @@
+{
+  "ShopifyTaxonomy": {
+    "blades": {
+      "import-blade": {
+        "title": "Shopify 分类导入",
+        "labels": {
+          "start-import": "开始导入",
+          "import-properties": "导入属性",
+          "import-localizations": "导入本地化"
+        }
+      },
+      "import-progress": {
+        "title": "正在导入 Shopify 分类",
+        "labels": {
+          "start": "开始",
+          "end": "结束",
+          "total": "总数",
+          "processed": "已处理数量",
+          "errors-count": "错误数量",
+          "errors": "错误"
+        }
+      }
+    }
+  },
+  "settings": {
+    "ShopifyTaxonomy": {
+      "ShopifyTaxonomyFileUrl": {
+        "title": "Shopify 分类文件 URL",
+        "description": "Shopify 分类文件的 URL。"
+      },
+      "ShopifyTaxonomyLanguagesCodes": {
+        "title": "Shopify 分类语言代码",
+        "description": "Shopify 使用的语言代码列表"
+      }
+    }
+  }
+}
