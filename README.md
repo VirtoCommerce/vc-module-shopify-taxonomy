@@ -8,6 +8,7 @@ Shopify Taxonomy module introduces functionality for importing Shopify's Standar
 2. Import Properties.
 3. Import Dictionary values.
 4. Import Localizations settings.
+5. Uses [latest](https://github.com/Shopify/product-taxonomy/tree/main/dist) version of the taxonomy. Path to the taxonomy file can be set up in Shopify Taxonomy Import Settings. 
 
 ## Screenshots
 
