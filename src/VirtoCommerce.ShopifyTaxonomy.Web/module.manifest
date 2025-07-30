@@ -9,8 +9,8 @@
     <!--<dependency id="VirtoCommerce.Core" version="3.800.0" />-->
   </dependencies>
 
-  <title>VirtoCommerce ShopifyTaxonomy</title>
-  <description>VirtoCommerce ShopifyTaxonomy</description>
+  <title>Shopify Taxonomy Importer</title>
+  <description>Importing Shopify's Standard Product Taxonomy into Virto Commerce catalog</description>
 
   <authors>
     <author>Konstantin Savosteev</author>
