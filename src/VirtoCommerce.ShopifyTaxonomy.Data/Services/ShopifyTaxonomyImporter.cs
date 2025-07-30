@@ -150,6 +150,9 @@ namespace VirtoCommerce.ShopifyTaxonomy.Data.Services
             // Third pass - create properties with values
             var propertiesResult = ProcessProperties(importRequest, catalogId, defaultLangugae, taxonomy, localizations, attributeMap);
 
+            // Fourth pass - disable inheritance for catalog level properties
+            await DisableInheritanceForRootCategories(categoriesResult, attributeMap, propertiesResult);
+
             progressInfo.TotalCount = propertiesResult.Properties.Count;
             progressInfo.ProcessedCount = 0;
             progressCallback(progressInfo);
@@ -157,33 +160,128 @@ namespace VirtoCommerce.ShopifyTaxonomy.Data.Services
             await SaveProperties(progressCallback, progressInfo, propertiesResult);
         }
 
-        private async Task SaveProperties(Action<ExportImportProgressInfo> progressCallback, ExportImportProgressInfo progressInfo, ProcessPropertiesResult propertiesResult)
+        private async Task<ProcessCatetgoriesResult> ProcessCategories(Action<ExportImportProgressInfo> progressCallback,
+            ExportImportProgressInfo progressInfo,
+            string catalogId,
+            string defaultLangugae,
+            List<ShopifyCategory> shopifyCategories)
         {
-            for (var i = 0; i < propertiesResult.Properties.Count; i += PageSize)
+            var result = new ProcessCatetgoriesResult();
+
+            var groups = shopifyCategories.GroupBy(x => x.Level);
+            foreach (var group in groups)
             {
-                var batch = propertiesResult.Properties.Skip(i).Take(PageSize).ToList();
-
-                await _propertyService.SaveChangesAsync(batch);
-
-                // Save dictionary items
-                foreach (var property in batch)
+                var categoryLevel = group.ToList();
+                // Process categories in batches
+                for (var i = 0; i < categoryLevel.Count; i += PageSize)
                 {
-                    if (!propertiesResult.PropertyItemsMaps.TryGetValue(property.OuterId, out var dictionaryItems))
-                    {
-                        continue;
-                    }
+                    var batch = categoryLevel.Skip(i).Take(PageSize);
+                    var processedCategories = await ProcessCategoryBatch(batch, catalogId, result.OuterIdsToCategoryIdsMap, defaultLangugae);
+                    result.Categories.AddRange(processedCategories);
 
-                    foreach (var item in dictionaryItems)
-                    {
-                        item.PropertyId = property.Id;
-                    }
+                    progressInfo.ProcessedCount += processedCategories.Count;
+                    progressCallback(progressInfo);
+                }
+            }
 
-                    await _propertyDictionaryItemService.SaveChangesAsync(dictionaryItems);
+            return result;
+        }
+
+        private async Task<List<Category>> ProcessCategoryBatch(IEnumerable<ShopifyCategory> shopifyCategories,
+            string catalogId,
+            Dictionary<string, string> outerIdsToCategoryIdsMap,
+            string defaultLanguage)
+        {
+            var categories = new List<Category>();
+
+            foreach (var shopifyCategory in shopifyCategories)
+            {
+                // Create or update category
+                var category = new Category
+                {
+                    Name = shopifyCategory.Name,
+                    OuterId = shopifyCategory.Id,
+                    Code = shopifyCategory.Id.Split('/').Last(), // Use the last part of the Shopify ID as code
+                    IsActive = true,
+                    CatalogId = catalogId,
+                };
+
+                var localizations = shopifyCategory.LocalizedName?.GetCopy() as LocalizedString;
+                localizations ??= new LocalizedString();
+                localizations.Values.TryAdd(defaultLanguage, shopifyCategory.Name);
+                category.LocalizedName = localizations;
+
+                // Set parent if exists
+                if (!string.IsNullOrEmpty(shopifyCategory.ParentId) && outerIdsToCategoryIdsMap.TryGetValue(shopifyCategory.ParentId, out var parentId))
+                {
+                    category.ParentId = parentId;
                 }
 
-                progressInfo.ProcessedCount += batch.Count;
-                progressCallback(progressInfo);
+                categories.Add(category);
             }
+
+            // Save categories in bulk
+            await _categoryService.SaveChangesAsync(categories);
+
+            foreach (var category in categories)
+            {
+                outerIdsToCategoryIdsMap.TryAdd(category.OuterId, category.Id); // Map outerId to internal Id
+            }
+
+            return categories;
+        }
+
+        private static Dictionary<string, AttributeCategoryWrapper> ProcessAttributeInheritance(List<ShopifyCategory> shopifyCategories,
+            ProcessCatetgoriesResult catetgoriesResult)
+        {
+            var attributeMap = new Dictionary<string, AttributeCategoryWrapper>(); // shopifyAttributeId -> wrapper
+
+            var categoryMap = catetgoriesResult.Categories.ToDictionary(c => c.Id);
+
+            foreach (var shopifyCategory in shopifyCategories)
+            {
+                foreach (var shopifyAttributeId in shopifyCategory.Attributes.Select(x => x.Id))
+                {
+                    var categoryId = catetgoriesResult.OuterIdsToCategoryIdsMap[shopifyCategory.Id];
+                    var category = categoryMap[categoryId];
+
+                    if (attributeMap.TryGetValue(shopifyAttributeId, out var wrapper))
+                    {
+                        if (wrapper.Category != null)
+                        {
+                            var cca = FindClosestCommonAncestor(categoryMap, wrapper.Category, category);
+
+                            if (cca == null)
+                            {
+                                var topLevelCatetoryFirst = FindTopLevelCatetory(categoryMap, wrapper.Category.Id);
+                                var topLevelCatetorySecond = FindTopLevelCatetory(categoryMap, category.Id);
+
+                                wrapper.IsRoot = true;
+
+                                wrapper.AllTargetCategories.TryAdd(topLevelCatetoryFirst.Id, topLevelCatetoryFirst);
+                                wrapper.AllTargetCategories.TryAdd(topLevelCatetorySecond.Id, topLevelCatetorySecond);
+
+                                wrapper.Category = category;
+                            }
+                            else
+                            {
+                                wrapper.Category = cca; // Set to the common ancestor category
+                            }
+                        }
+                    }
+                    else
+                    {
+                        wrapper = new AttributeCategoryWrapper
+                        {
+                            Category = category, // Initialize with the current category
+                        };
+
+                        attributeMap.Add(shopifyAttributeId, wrapper);
+                    }
+                }
+            }
+
+            return attributeMap;
         }
 
         private static ProcessPropertiesResult ProcessProperties(ShopifyTaxonomyImportRequest importRequest,
@@ -213,13 +311,13 @@ namespace VirtoCommerce.ShopifyTaxonomy.Data.Services
                     Type = PropertyType.Product,
                 };
 
-                if (attributeCategoryWrapper.Category != null)
+                if (attributeCategoryWrapper.IsRoot)
                 {
-                    property.CategoryId = attributeCategoryWrapper.Category.Id;
+                    property.CatalogId = catalogId; // Use catalog as container if no specific category
                 }
                 else
                 {
-                    property.CatalogId = catalogId; // Use catalog as container if no specific category
+                    property.CategoryId = attributeCategoryWrapper.Category.Id;
                 }
 
                 // localization
@@ -307,39 +405,64 @@ namespace VirtoCommerce.ShopifyTaxonomy.Data.Services
             }
         }
 
-        private static Dictionary<string, AttributeCategoryWrapper> ProcessAttributeInheritance(List<ShopifyCategory> shopifyCategories, ProcessCatetgoriesResult catetgoriesResult)
+        private async Task SaveProperties(Action<ExportImportProgressInfo> progressCallback,
+            ExportImportProgressInfo progressInfo,
+            ProcessPropertiesResult propertiesResult)
         {
-            var attributeMap = new Dictionary<string, AttributeCategoryWrapper>(); // shopifyAttributeId -> wrapper
-
-            var categoryMap = catetgoriesResult.Categories.ToDictionary(c => c.Id);
-
-            foreach (var shopifyCategory in shopifyCategories)
+            for (var i = 0; i < propertiesResult.Properties.Count; i += PageSize)
             {
-                foreach (var shopifyAttributeId in shopifyCategory.Attributes.Select(x => x.Id))
+                var batch = propertiesResult.Properties.Skip(i).Take(PageSize).ToList();
+
+                await _propertyService.SaveChangesAsync(batch);
+
+                // Save dictionary items
+                foreach (var property in batch)
                 {
-                    var categoryId = catetgoriesResult.OuterIdsToCategoryIdsMap[shopifyCategory.Id];
-                    var category = categoryMap[categoryId];
-
-                    if (attributeMap.TryGetValue(shopifyAttributeId, out var wrapper))
+                    if (!propertiesResult.PropertyItemsMaps.TryGetValue(property.OuterId, out var dictionaryItems))
                     {
-                        if (wrapper.Category != null)
-                        {
-                            wrapper.Category = FindClosestCommonAncestor(categoryMap, wrapper.Category, category);
-                        }
+                        continue;
                     }
-                    else
-                    {
-                        wrapper = new AttributeCategoryWrapper
-                        {
-                            Category = category, // Initialize with the current category
-                        };
 
-                        attributeMap.Add(shopifyAttributeId, wrapper);
+                    foreach (var item in dictionaryItems)
+                    {
+                        item.PropertyId = property.Id;
+                    }
+
+                    await _propertyDictionaryItemService.SaveChangesAsync(dictionaryItems);
+                }
+
+                progressInfo.ProcessedCount += batch.Count;
+                progressCallback(progressInfo);
+            }
+        }
+
+        private async Task DisableInheritanceForRootCategories(ProcessCatetgoriesResult categoriesResult,
+            Dictionary<string, AttributeCategoryWrapper> attributeMap,
+            ProcessPropertiesResult propertiesResult)
+        {
+            var rootLevelCategories = categoriesResult.Categories.Where(x => x.ParentId == null).ToList();
+            foreach (var wrapper in attributeMap.Where(x => x.Value.IsRoot))
+            {
+                var categories = wrapper.Value.AllTargetCategories.Keys.ToList();
+                foreach (var rootCategory in rootLevelCategories)
+                {
+                    if (!categories.Contains(rootCategory.Id))
+                    {
+                        rootCategory.ExcludedProperties ??= new List<ExcludedProperty>();
+
+                        var property = propertiesResult.Properties.FirstOrDefault(x => x.OuterId == wrapper.Key);
+                        if (property != null)
+                        {
+                            var excludedProperty = new ExcludedProperty
+                            {
+                                Name = property.Name,
+                            };
+                            rootCategory.ExcludedProperties.Add(excludedProperty);
+                        }
                     }
                 }
             }
-
-            return attributeMap;
+            await _categoryService.SaveChangesAsync(rootLevelCategories);
         }
 
         private static Category FindClosestCommonAncestor(Dictionary<string, Category> categoryMap, Category first, Category second)
@@ -355,31 +478,16 @@ namespace VirtoCommerce.ShopifyTaxonomy.Data.Services
             return null;
         }
 
-        private async Task<ProcessCatetgoriesResult> ProcessCategories(Action<ExportImportProgressInfo> progressCallback,
-            ExportImportProgressInfo progressInfo,
-            string catalogId,
-            string defaultLangugae,
-            List<ShopifyCategory> shopifyCategories)
+        private static Category FindTopLevelCatetory(Dictionary<string, Category> categoryMap, string categoryId)
         {
-            var result = new ProcessCatetgoriesResult();
+            var category = categoryMap[categoryId];
 
-            var groups = shopifyCategories.GroupBy(x => x.Level);
-            foreach (var group in groups)
+            while (category.ParentId != null)
             {
-                var categoryLevel = group.ToList();
-                // Process categories in batches
-                for (var i = 0; i < categoryLevel.Count; i += PageSize)
-                {
-                    var batch = categoryLevel.Skip(i).Take(PageSize);
-                    var processedCategories = await ProcessCategoryBatch(batch, catalogId, result.OuterIdsToCategoryIdsMap, defaultLangugae);
-                    result.Categories.AddRange(processedCategories);
-
-                    progressInfo.ProcessedCount += processedCategories.Count;
-                    progressCallback(progressInfo);
-                }
+                category = categoryMap[category.ParentId];
             }
 
-            return result;
+            return category;
         }
 
         private async Task<List<LocalizedTaxonomyResource>> GetLocalizationResources(string defaultLangugae,
@@ -438,50 +546,6 @@ namespace VirtoCommerce.ShopifyTaxonomy.Data.Services
             return localizations;
         }
 
-        private async Task<List<Category>> ProcessCategoryBatch(IEnumerable<ShopifyCategory> shopifyCategories,
-            string catalogId,
-            Dictionary<string, string> outerIdsToCategoryIdsMap,
-            string defaultLanguage)
-        {
-            var categories = new List<Category>();
-
-            foreach (var shopifyCategory in shopifyCategories)
-            {
-                // Create or update category
-                var category = new Category
-                {
-                    Name = shopifyCategory.Name,
-                    OuterId = shopifyCategory.Id,
-                    Code = shopifyCategory.Id.Split('/').Last(), // Use the last part of the Shopify ID as code
-                    IsActive = true,
-                    CatalogId = catalogId,
-                };
-
-                var localizations = shopifyCategory.LocalizedName?.GetCopy() as LocalizedString;
-                localizations ??= new LocalizedString();
-                localizations.Values.TryAdd(defaultLanguage, shopifyCategory.Name);
-                category.LocalizedName = localizations;
-
-                // Set parent if exists
-                if (!string.IsNullOrEmpty(shopifyCategory.ParentId) && outerIdsToCategoryIdsMap.TryGetValue(shopifyCategory.ParentId, out var parentId))
-                {
-                    category.ParentId = parentId;
-                }
-
-                categories.Add(category);
-            }
-
-            // Save categories in bulk
-            await _categoryService.SaveChangesAsync(categories);
-
-            foreach (var category in categories)
-            {
-                outerIdsToCategoryIdsMap.TryAdd(category.OuterId, category.Id); // Map outerId to internal Id
-            }
-
-            return categories;
-        }
-
         private async Task<Stream> DownloadMainTaxonomyFileAsync(string fileUrl)
         {
             var client = _httpClientFactory.CreateClient();
@@ -520,10 +584,12 @@ namespace VirtoCommerce.ShopifyTaxonomy.Data.Services
             return result;
         }
 
-
         private sealed class AttributeCategoryWrapper
         {
-            public Category Category { get; set; } // Null category means use Catalog as container - skip finding common ancestor then
+            public Category Category { get; set; }
+
+            public bool IsRoot { get; set; } // If category is null, it means this attribute is at the catalog level
+            public Dictionary<string, Category> AllTargetCategories { get; set; } = [];
         }
 
         private sealed class LocalizedTaxonomyResource
