@@ -29,6 +29,11 @@ Shopify Taxonomy module introduces functionality for importing Shopify's Standar
 
 Now you can import your products.
 
+## Attributes
+
+The module imports attributes from Shopify's Standard Product Taxonomy. The attributes are imported as properties in Virto Commerce Catalog and you can use these properties to define product characteristics. Attributes that are present in the Shopify Taxonomy on different levels of the hierarchy bubble up to the parent category. For example, if a category has an attribute "Color" and its subcategory has the same attribute, the parent category will have the "Color" attribute and all subcategories will inherit it. In case of attributes that are defined at different leafs of the category tree the imported property will be defined at the catalog level. For example, "Pattern" is defined both at the "Business & Industrial" category and at the "Furniture" subcategory that are both level 0 categories. In this case, the "Pattern" property will be defined at the catalog level.
+
+
 ## References
 * [Deployment](https://docs.virtocommerce.org/platform/developer-guide/Tutorials-and-How-tos/Tutorials/deploy-module-from-source-code/)
 * [Installation](https://docs.virtocommerce.org/platform/user-guide/modules-installation/)
