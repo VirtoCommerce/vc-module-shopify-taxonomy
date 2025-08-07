@@ -4,13 +4,13 @@
   <version>3.800.0</version>
   <version-tag></version-tag>
 
-  <platformVersion>3.876.0</platformVersion>
+  <platformVersion>3.891.0</platformVersion>
   <dependencies>
     <!--<dependency id="VirtoCommerce.Core" version="3.800.0" />-->
   </dependencies>
 
-  <title>VirtoCommerce ShopifyTaxonomy</title>
-  <description>VirtoCommerce ShopifyTaxonomy</description>
+  <title>Shopify Taxonomy Importer</title>
+  <description>Importing Shopify's Standard Product Taxonomy into Virto Commerce catalog</description>
 
   <authors>
     <author>Konstantin Savosteev</author>

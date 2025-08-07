@@ -8,13 +8,11 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
-    <PackageReference Include="VirtoCommerce.Platform.Data" Version="3.876.0" />
+    <PackageReference Include="VirtoCommerce.Platform.Data" Version="3.891.0" />
+    <PackageReference Include="VirtoCommerce.Platform.Hangfire" Version="3.891.0" />
+    <PackageReference Include="VirtoCommerce.CatalogModule.Data" Version="3.872.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VirtoCommerce.ShopifyTaxonomy.Core\VirtoCommerce.ShopifyTaxonomy.Core.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Models\" />
-    <Folder Include="Services\" />
   </ItemGroup>
 </Project>

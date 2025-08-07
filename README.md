@@ -1,58 +1,55 @@
-# ShopifyTaxonomy
+# Import Shopify Taxonomy
+Shopify Taxonomy module introduces functionality for importing Shopify's Standard Product Taxonomy into Virto Commerce Catalog. It enhances the performance and quality of new catalogue configurations with open-source taxonomy and attributes. 
 
-## Overview
+> [Shopify's Standard Product Taxonomy](https://shopify.github.io/product-taxonomy/) serves as an open-source, standardized, and global classification of products sold on Shopify. Composed of product categories, attributes, and attribute values, the taxonomy is leveraged across Shopify and is integrated with numerous marketplaces.
 
-Short overview of what the new module is.
+## Ket features
+1. Import Shopify's public product taxonomy into Virto Commerce Catalog.
+2. Import Properties.
+3. Import Dictionary values.
+4. Import Localizations settings.
+5. Uses [latest](https://github.com/Shopify/product-taxonomy/tree/main/dist) version of the taxonomy. Path to the taxonomy file can be set up in Shopify Taxonomy Import Settings. 
 
-- What is the new or updated experience?
+## Screenshots
 
-- Does this module replace an existing module/experience? If yes, what is the transition plan?
+### Create a new catalog, click Import and click Shopify Taxonomy Import
+<img width="1026" height="572" alt="image" src="https://github.com/user-attachments/assets/cd46f470-f548-49fc-a8a4-a379b7a4c8fa" />
 
-- Does this module has dependency on other ? If yes, list/explain the dependencies.
+### Select import options
+<img width="1022" height="553" alt="image" src="https://github.com/user-attachments/assets/d9e87ac5-1cb9-4431-b90f-012bcc221bab" />
 
-- List the key deployment scenarios - why would people use this module?
+### Wait for a minute
+<img width="1076" height="642" alt="image" src="https://github.com/user-attachments/assets/1b0baeb7-d72a-49f7-a05f-6dd27d96bcc0" />
 
-## Functional Requirements
+### Review new categories
+<img width="987" height="785" alt="image" src="https://github.com/user-attachments/assets/65a329a5-693e-40e3-8fc6-efd7e502002b" />
 
-Short description of the new module functional requirements.
+### Add properties
+<img width="1546" height="993" alt="image" src="https://github.com/user-attachments/assets/1b4770f8-4de5-44c9-9809-c8d62b0a5711" />
 
-## Scenarios
+Now you can import your products.
 
-List of scenarios that the new module implements
+## Attributes
 
-1. [Scenario 1](/doc/scenario-name1.md)
-1. [Scenario 2](/doc/scenario-name2.md)
-1. [Scenario 3](/doc/scenario-name3.md)
-    1. [Scenario 3.1](/doc/scenario-name31.md)
-    1. [Scenario 3.2](/doc/scenario-name32.md)
-1. [Scenario 4](/doc/scenario-name4.md)
+The module imports attributes from Shopify's Standard Product Taxonomy. The attributes are imported as properties in Virto Commerce Catalog and you can use these properties to define product characteristics. Attributes that are present in the Shopify Taxonomy on different levels of the hierarchy bubble up to the parent category. For example, if a category has an attribute "Color" and its subcategory has the same attribute, the parent category will have the "Color" attribute and all subcategories will inherit it. In case of attributes that are defined at different leafs of the category tree the imported property will be defined at the catalog level. For example, "Pattern" is defined both at the "Business & Industrial" category and at the "Furniture" subcategory that are both level 0 categories. In this case, the "Pattern" property will be defined at the catalog level.
 
-## Web API
 
-Web API documentation for each module is built out automatically and can be accessed by following the link bellow:
-<https://link-to-swager-api>
-
-## Database Model
-
-![DB model](./docs/media/diagram-db-model.png)
-
-## Related topics
-
-[Some Article1](some-article1.md)
-
-[Some Article2](some-article2.md)
+## References
+* [Deployment](https://docs.virtocommerce.org/platform/developer-guide/Tutorials-and-How-tos/Tutorials/deploy-module-from-source-code/)
+* [Installation](https://docs.virtocommerce.org/platform/user-guide/modules-installation/)
+* [Home](https://virtocommerce.com)
+* [Community](https://www.virtocommerce.org)
+* [Download latest release](https://github.com/VirtoCommerce/vc-module-shopify-taxonomy/releases)
 
 ## License
-
 Copyright (c) Virto Solutions LTD.  All rights reserved.
 
-Licensed under the Virto Commerce Open Software License (the "License"); you
+This software is licensed under the Virto Commerce Open Software License (the "License"); you
 may not use this file except in compliance with the License. You may
-obtain a copy of the License at
+obtain a copy of the License at http://virtocommerce.com/opensourcelicense.
 
-<https://virtocommerce.com/open-source-license>
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
+Unless required by the applicable law or agreed to in written form, the software
+distributed under the License is provided on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
 implied.
+

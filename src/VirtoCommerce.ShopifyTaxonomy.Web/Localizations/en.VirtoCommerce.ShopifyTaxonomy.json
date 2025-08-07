@@ -1,23 +1,36 @@
 {
   "ShopifyTaxonomy": {
     "blades": {
-      "hello-world": {
-        "title": "Hello world blade"
+      "import-blade": {
+        "title": "Shopify Taxonomy Import",
+        "labels": {
+          "start-import": "Start Import",
+          "import-properties": "Import Properties",
+          "import-localizations": "Import Localizations"
+        }
+      },
+      "import-progress": {
+        "title": "Importing Shopify Taxonomy",
+        "labels": {
+          "start": "Start",
+          "end": "End",
+          "total": "Total count",
+          "processed": "Processed count",
+          "errors-count": "Error count",
+          "errors": "Errors"
+        }
       }
     }
   },
-  "permissions": {
-    "shopify-taxonomy:access": "Open ShopifyTaxonomy menu",
-    "shopify-taxonomy:create": "Create ShopifyTaxonomy related data",
-    "shopify-taxonomy:read": "View ShopifyTaxonomy related data",
-    "shopify-taxonomy:update": "Update ShopifyTaxonomy related data",
-    "shopify-taxonomy:delete": "Delete ShopifyTaxonomy related data"
-  },
   "settings": {
     "ShopifyTaxonomy": {
-      "Enabled": {
-        "title": "ShopifyTaxonomy Enabled",
-        "description": "ShopifyTaxonomy Enabled setting"
+      "ShopifyTaxonomyFileUrl": {
+        "title": "Shopify Taxonomy File URL",
+        "description": "URL to the Shopify Taxonomy file."
+      },
+      "ShopifyTaxonomyLanguagesCodes": {
+        "title": "Shopify Taxonomy Language Codes",
+        "description": "List of language codes used by Shopify"
       }
     }
   }

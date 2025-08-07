@@ -1,0 +1,37 @@
+{
+  "ShopifyTaxonomy": {
+    "blades": {
+      "import-blade": {
+        "title": "Shopify分類インポート",
+        "labels": {
+          "start-import": "インポート開始",
+          "import-properties": "プロパティのインポート",
+          "import-localizations": "ローカライズのインポート"
+        }
+      },
+      "import-progress": {
+        "title": "Shopify分類をインポート中",
+        "labels": {
+          "start": "開始",
+          "end": "終了",
+          "total": "合計件数",
+          "processed": "処理済み件数",
+          "errors-count": "エラー件数",
+          "errors": "エラー"
+        }
+      }
+    }
+  },
+  "settings": {
+    "ShopifyTaxonomy": {
+      "ShopifyTaxonomyFileUrl": {
+        "title": "Shopify分類ファイルのURL",
+        "description": "Shopify分類ファイルへのURL。"
+      },
+      "ShopifyTaxonomyLanguagesCodes": {
+        "title": "Shopify分類の言語コード",
+        "description": "Shopifyで使用される言語コードの一覧"
+      }
+    }
+  }
+}
