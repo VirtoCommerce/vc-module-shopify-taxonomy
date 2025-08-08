@@ -3,7 +3,7 @@ Shopify Taxonomy module introduces functionality for importing Shopify's Standar
 
 > [Shopify's Standard Product Taxonomy](https://shopify.github.io/product-taxonomy/) serves as an open-source, standardized, and global classification of products sold on Shopify. Composed of product categories, attributes, and attribute values, the taxonomy is leveraged across Shopify and is integrated with numerous marketplaces.
 
-## Ket features
+## Key features
 1. Import Shopify's public product taxonomy into Virto Commerce Catalog.
 2. Import Properties.
 3. Import Dictionary values.
