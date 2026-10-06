@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <module>
   <id>VirtoCommerce.ShopifyTaxonomy</id>
-  <version>3.801.0</version>
+  <version>3.1000.0</version>
   <version-tag></version-tag>
 
-  <platformVersion>3.891.0</platformVersion>
+  <platformVersion>3.1039.12</platformVersion>
   <dependencies>
-    <!--<dependency id="VirtoCommerce.Core" version="3.800.0" />-->
+      <dependency id="VirtoCommerce.Catalog" version="3.1029.6" />
   </dependencies>
 
   <title>Shopify Taxonomy Importer</title>
@@ -20,14 +20,14 @@
   </owners>
 
   <projectUrl>https://github.com/VirtoCommerce/vc-module-shopify-taxonomy</projectUrl>
-  <iconUrl>Modules/$(VirtoCommerce.ShopifyTaxonomy)/Content/logo.png</iconUrl>
+  <iconUrl>Modules/$(VirtoCommerce.ShopifyTaxonomy)/Content/logo.svg</iconUrl>
   <requireLicenseAcceptance>false</requireLicenseAcceptance>
 
   <assemblyFile>VirtoCommerce.ShopifyTaxonomy.Web.dll</assemblyFile>
   <moduleType>VirtoCommerce.ShopifyTaxonomy.Web.Module, VirtoCommerce.ShopifyTaxonomy.Web</moduleType>
 
   <releaseNotes>First version.</releaseNotes>
-  <copyright>Copyright © 2025 VirtoCommerce. All rights reserved</copyright>
+  <copyright>Copyright © 2026 VirtoCommerce. All rights reserved</copyright>
   <tags>extension module</tags>
   <useFullTypeNameInSwagger>false</useFullTypeNameInSwagger>
 </module>
