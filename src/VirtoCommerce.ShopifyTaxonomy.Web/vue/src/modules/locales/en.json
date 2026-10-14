@@ -1,0 +1,19 @@
+{
+  "SHOPIFY_TAXONOMY": {
+    "IMPORT": {
+      "COMMAND": "Shopify taxonomy",
+      "TITLE": "Shopify Taxonomy Import",
+      "PROPERTIES": "Import properties",
+      "LOCALIZATIONS": "Import localizations",
+      "START": "Start import"
+    },
+    "PROGRESS": {
+      "TITLE": "Importing Shopify Taxonomy",
+      "START": "Start",
+      "END": "End",
+      "TOTAL": "Total count",
+      "PROCESSED": "Processed count",
+      "ERROR_COUNT": "Error count"
+    }
+  }
+}

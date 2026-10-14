@@ -337,3 +337,5 @@ ASALocalRun/
 .nuke
 dist/
 **/Properties/launchSettings.json
+# Admin Shell plugin build output (built from src/VirtoCommerce.ShopifyTaxonomy.Web/vue)
+src/VirtoCommerce.ShopifyTaxonomy.Web/plugins/
