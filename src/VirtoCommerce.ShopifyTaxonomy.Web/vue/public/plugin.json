@@ -1,5 +1,3 @@
 {
-  // Shopify taxonomy import for the Admin Shell host (Module Federation remote): a command on the Catalog list toolbar,
-  // no menu item
   "remote": { "name": "shopifytaxonomy_admin", "exposed": "./Module" }
 }

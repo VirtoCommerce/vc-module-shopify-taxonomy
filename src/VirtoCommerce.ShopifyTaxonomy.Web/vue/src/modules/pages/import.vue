@@ -86,13 +86,10 @@ const importProperties = ref(true);
 const importLocalizations = ref(true);
 const job = ref<ShopifyTaxonomyImportNotification>();
 const running = computed(() => !!job.value && !job.value.finished);
-const percent = computed(() =>
-  job.value?.finished
-    ? 100
-    : job.value?.totalCount
-      ? Math.round(((job.value.processedCount ?? 0) * 100) / job.value.totalCount)
-      : 0,
-);
+const percent = computed(() => {
+  if (job.value?.finished) return 100;
+  return job.value?.totalCount ? Math.round(((job.value.processedCount ?? 0) * 100) / job.value.totalCount) : 0;
+});
 const time = (d: Date | string) => new Date(d).toLocaleTimeString();
 
 useBladeNotifications<ShopifyTaxonomyImportNotification>({

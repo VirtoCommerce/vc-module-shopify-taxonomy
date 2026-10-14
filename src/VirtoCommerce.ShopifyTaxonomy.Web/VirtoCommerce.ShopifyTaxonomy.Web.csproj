@@ -25,6 +25,14 @@
     <AdminShellPlugin Include="plugins\**" />
   </ItemGroup>
   <ItemGroup>
+    <!-- NSwag emits repeated request/response plumbing; regenerate these clients instead of refactoring them.
+         They stay project items so this project-level setting reaches them. -->
+    <None Include="vue\src\api_client\virtocommerce.*.ts" />
+    <SonarQubeSetting Include="sonar.cpd.exclusions">
+      <Value>**/vue/src/api_client/virtocommerce.*.ts</Value>
+    </SonarQubeSetting>
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\VirtoCommerce.ShopifyTaxonomy.Core\VirtoCommerce.ShopifyTaxonomy.Core.csproj" />
     <ProjectReference Include="..\VirtoCommerce.ShopifyTaxonomy.Data\VirtoCommerce.ShopifyTaxonomy.Data.csproj" />
   </ItemGroup>
