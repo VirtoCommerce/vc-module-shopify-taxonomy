@@ -1,0 +1,14 @@
+{
+  "settings": {
+    "ShopifyTaxonomy": {
+      "ShopifyTaxonomyFileUrl": {
+        "title": "URL של קובץ הטקסונומיה של Shopify",
+        "description": "URL לקובץ הטקסונומיה של Shopify."
+      },
+      "ShopifyTaxonomyLanguagesCodes": {
+        "title": "קודי השפה של הטקסונומיה של Shopify",
+        "description": "רשימת קודי השפה ש-Shopify משתמשת בהם"
+      }
+    }
+  }
+}
