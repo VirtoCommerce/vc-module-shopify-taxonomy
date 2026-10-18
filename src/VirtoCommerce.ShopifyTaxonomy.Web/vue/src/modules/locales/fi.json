@@ -1,0 +1,19 @@
+{
+  "SHOPIFY_TAXONOMY": {
+    "IMPORT": {
+      "COMMAND": "Shopify-taksonomia",
+      "TITLE": "Shopify-taksonomian tuonti",
+      "PROPERTIES": "Tuo ominaisuudet",
+      "LOCALIZATIONS": "Tuo lokalisoinnit",
+      "START": "Aloita tuonti"
+    },
+    "PROGRESS": {
+      "TITLE": "Shopify-taksonomiaa tuodaan",
+      "START": "Alku",
+      "END": "Loppu",
+      "TOTAL": "Kokonaismäärä",
+      "PROCESSED": "Käsitelty",
+      "ERROR_COUNT": "Virheiden määrä"
+    }
+  }
+}

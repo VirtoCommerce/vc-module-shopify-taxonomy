@@ -1,0 +1,19 @@
+{
+  "SHOPIFY_TAXONOMY": {
+    "IMPORT": {
+      "COMMAND": "Shopify 分类",
+      "TITLE": "Shopify 分类导入",
+      "PROPERTIES": "导入属性",
+      "LOCALIZATIONS": "导入本地化",
+      "START": "开始导入"
+    },
+    "PROGRESS": {
+      "TITLE": "正在导入 Shopify 分类",
+      "START": "开始",
+      "END": "结束",
+      "TOTAL": "总数",
+      "PROCESSED": "已处理数量",
+      "ERROR_COUNT": "错误数量"
+    }
+  }
+}

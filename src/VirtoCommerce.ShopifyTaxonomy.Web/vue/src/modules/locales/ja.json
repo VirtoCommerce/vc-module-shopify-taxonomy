@@ -1,0 +1,19 @@
+{
+  "SHOPIFY_TAXONOMY": {
+    "IMPORT": {
+      "COMMAND": "Shopify分類",
+      "TITLE": "Shopify分類インポート",
+      "PROPERTIES": "プロパティのインポート",
+      "LOCALIZATIONS": "ローカライズのインポート",
+      "START": "インポート開始"
+    },
+    "PROGRESS": {
+      "TITLE": "Shopify分類をインポート中",
+      "START": "開始",
+      "END": "終了",
+      "TOTAL": "合計件数",
+      "PROCESSED": "処理済み件数",
+      "ERROR_COUNT": "エラー件数"
+    }
+  }
+}
