@@ -1,0 +1,19 @@
+{
+  "SHOPIFY_TAXONOMY": {
+    "IMPORT": {
+      "COMMAND": "تصنيف Shopify",
+      "TITLE": "استيراد تصنيف Shopify",
+      "PROPERTIES": "استيراد الخصائص",
+      "LOCALIZATIONS": "استيراد الترجمات",
+      "START": "بدء الاستيراد"
+    },
+    "PROGRESS": {
+      "TITLE": "جارٍ استيراد تصنيف Shopify",
+      "START": "البداية",
+      "END": "النهاية",
+      "TOTAL": "العدد الإجمالي",
+      "PROCESSED": "عدد العناصر المعالَجة",
+      "ERROR_COUNT": "عدد الأخطاء"
+    }
+  }
+}
