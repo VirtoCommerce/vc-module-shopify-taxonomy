@@ -1,0 +1,37 @@
+{
+  "ShopifyTaxonomy": {
+    "blades": {
+      "import-blade": {
+        "title": "Import av Shopify-taxonomi",
+        "labels": {
+          "start-import": "Starta import",
+          "import-properties": "Importera egenskaper",
+          "import-localizations": "Importera lokaliseringar"
+        }
+      },
+      "import-progress": {
+        "title": "Importerar Shopify-taxonomi",
+        "labels": {
+          "start": "Start",
+          "end": "Slut",
+          "total": "Totalt antal",
+          "processed": "Antal bearbetade",
+          "errors-count": "Antal fel",
+          "errors": "Fel"
+        }
+      }
+    }
+  },
+  "settings": {
+    "ShopifyTaxonomy": {
+      "ShopifyTaxonomyFileUrl": {
+        "title": "URL till Shopify-taxonomifil",
+        "description": "URL till Shopify-taxonomifilen."
+      },
+      "ShopifyTaxonomyLanguagesCodes": {
+        "title": "Språkkoder för Shopify-taxonomi",
+        "description": "Lista över språkkoder som används av Shopify"
+      }
+    }
+  }
+}

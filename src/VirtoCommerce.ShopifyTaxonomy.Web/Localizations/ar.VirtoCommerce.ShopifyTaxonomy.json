@@ -1,0 +1,37 @@
+{
+  "ShopifyTaxonomy": {
+    "blades": {
+      "import-blade": {
+        "title": "استيراد تصنيف Shopify",
+        "labels": {
+          "start-import": "بدء الاستيراد",
+          "import-properties": "استيراد الخصائص",
+          "import-localizations": "استيراد الترجمات"
+        }
+      },
+      "import-progress": {
+        "title": "جارٍ استيراد تصنيف Shopify",
+        "labels": {
+          "start": "البداية",
+          "end": "النهاية",
+          "total": "العدد الإجمالي",
+          "processed": "عدد العناصر المعالَجة",
+          "errors-count": "عدد الأخطاء",
+          "errors": "الأخطاء"
+        }
+      }
+    }
+  },
+  "settings": {
+    "ShopifyTaxonomy": {
+      "ShopifyTaxonomyFileUrl": {
+        "title": "URL ملف تصنيف Shopify",
+        "description": "عنوان URL لملف تصنيف Shopify."
+      },
+      "ShopifyTaxonomyLanguagesCodes": {
+        "title": "رموز لغات تصنيف Shopify",
+        "description": "قائمة رموز اللغات التي يستخدمها Shopify."
+      }
+    }
+  }
+}

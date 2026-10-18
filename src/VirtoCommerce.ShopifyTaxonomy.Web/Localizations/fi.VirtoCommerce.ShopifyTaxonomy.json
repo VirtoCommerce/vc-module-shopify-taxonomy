@@ -1,0 +1,37 @@
+{
+  "ShopifyTaxonomy": {
+    "blades": {
+      "import-blade": {
+        "title": "Shopify-taksonomian tuonti",
+        "labels": {
+          "start-import": "Aloita tuonti",
+          "import-properties": "Tuo ominaisuudet",
+          "import-localizations": "Tuo lokalisoinnit"
+        }
+      },
+      "import-progress": {
+        "title": "Shopify-taksonomiaa tuodaan",
+        "labels": {
+          "start": "Alku",
+          "end": "Loppu",
+          "total": "Kokonaismäärä",
+          "processed": "Käsiteltyjen määrä",
+          "errors-count": "Virheiden määrä",
+          "errors": "Virheet"
+        }
+      }
+    }
+  },
+  "settings": {
+    "ShopifyTaxonomy": {
+      "ShopifyTaxonomyFileUrl": {
+        "title": "Shopify-taksonomiatiedoston URL",
+        "description": "Shopify-taksonomiatiedoston URL-osoite."
+      },
+      "ShopifyTaxonomyLanguagesCodes": {
+        "title": "Shopify-taksonomian kielikoodit",
+        "description": "Luettelo Shopifyn käyttämistä kielikoodeista"
+      }
+    }
+  }
+}
