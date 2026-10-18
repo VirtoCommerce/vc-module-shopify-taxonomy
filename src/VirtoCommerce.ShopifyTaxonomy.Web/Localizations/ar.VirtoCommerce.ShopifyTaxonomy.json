@@ -1,0 +1,14 @@
+{
+  "settings": {
+    "ShopifyTaxonomy": {
+      "ShopifyTaxonomyFileUrl": {
+        "title": "URL ملف تصنيف Shopify",
+        "description": "عنوان URL لملف تصنيف Shopify."
+      },
+      "ShopifyTaxonomyLanguagesCodes": {
+        "title": "رموز لغات تصنيف Shopify",
+        "description": "قائمة رموز اللغات التي يستخدمها Shopify."
+      }
+    }
+  }
+}
