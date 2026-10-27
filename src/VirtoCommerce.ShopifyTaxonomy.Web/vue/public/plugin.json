@@ -1,0 +1,3 @@
+{
+  "remote": { "name": "shopifytaxonomy_admin", "exposed": "./Module" }
+}

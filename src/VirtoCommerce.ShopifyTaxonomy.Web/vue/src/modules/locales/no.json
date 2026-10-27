@@ -1,0 +1,19 @@
+{
+  "SHOPIFY_TAXONOMY": {
+    "IMPORT": {
+      "COMMAND": "Shopify-taksonomi",
+      "TITLE": "Import av Shopify-taksonomi",
+      "PROPERTIES": "Importer egenskaper",
+      "LOCALIZATIONS": "Importer lokaliseringer",
+      "START": "Start import"
+    },
+    "PROGRESS": {
+      "TITLE": "Importerer Shopify-taksonomi",
+      "START": "Start",
+      "END": "Slutt",
+      "TOTAL": "Totalt antall",
+      "PROCESSED": "Behandlet",
+      "ERROR_COUNT": "Antall feil"
+    }
+  }
+}

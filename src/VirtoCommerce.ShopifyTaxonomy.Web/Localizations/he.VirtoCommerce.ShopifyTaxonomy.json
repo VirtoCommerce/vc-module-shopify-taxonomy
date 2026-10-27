@@ -1,0 +1,37 @@
+{
+  "ShopifyTaxonomy": {
+    "blades": {
+      "import-blade": {
+        "title": "ייבוא טקסונומיית Shopify",
+        "labels": {
+          "start-import": "התחלת ייבוא",
+          "import-properties": "ייבוא מאפיינים",
+          "import-localizations": "ייבוא תרגומים"
+        }
+      },
+      "import-progress": {
+        "title": "מתבצע ייבוא של טקסונומיית Shopify",
+        "labels": {
+          "start": "התחלה",
+          "end": "סיום",
+          "total": "סה״כ",
+          "processed": "פריטים שעובדו",
+          "errors-count": "מספר שגיאות",
+          "errors": "שגיאות"
+        }
+      }
+    }
+  },
+  "settings": {
+    "ShopifyTaxonomy": {
+      "ShopifyTaxonomyFileUrl": {
+        "title": "URL של קובץ הטקסונומיה של Shopify",
+        "description": "URL לקובץ הטקסונומיה של Shopify."
+      },
+      "ShopifyTaxonomyLanguagesCodes": {
+        "title": "קודי השפה של הטקסונומיה של Shopify",
+        "description": "רשימת קודי השפה ש-Shopify משתמשת בהם"
+      }
+    }
+  }
+}

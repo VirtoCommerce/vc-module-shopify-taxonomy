@@ -1,0 +1,19 @@
+{
+  "SHOPIFY_TAXONOMY": {
+    "IMPORT": {
+      "COMMAND": "Taksonomia Shopify",
+      "TITLE": "Import taksonomii Shopify",
+      "PROPERTIES": "Importuj właściwości",
+      "LOCALIZATIONS": "Importuj lokalizacje",
+      "START": "Rozpocznij import"
+    },
+    "PROGRESS": {
+      "TITLE": "Importowanie taksonomii Shopify",
+      "START": "Początek",
+      "END": "Koniec",
+      "TOTAL": "Łączna liczba",
+      "PROCESSED": "Liczba przetworzonych",
+      "ERROR_COUNT": "Liczba błędów"
+    }
+  }
+}

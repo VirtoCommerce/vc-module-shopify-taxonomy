@@ -1,0 +1,19 @@
+{
+  "SHOPIFY_TAXONOMY": {
+    "IMPORT": {
+      "COMMAND": "טקסונומיית Shopify",
+      "TITLE": "ייבוא טקסונומיית Shopify",
+      "PROPERTIES": "ייבוא מאפיינים",
+      "LOCALIZATIONS": "ייבוא תרגומים",
+      "START": "התחלת ייבוא"
+    },
+    "PROGRESS": {
+      "TITLE": "מתבצע ייבוא של טקסונומיית Shopify",
+      "START": "התחלה",
+      "END": "סיום",
+      "TOTAL": "סה״כ",
+      "PROCESSED": "פריטים שעובדו",
+      "ERROR_COUNT": "מספר שגיאות"
+    }
+  }
+}
