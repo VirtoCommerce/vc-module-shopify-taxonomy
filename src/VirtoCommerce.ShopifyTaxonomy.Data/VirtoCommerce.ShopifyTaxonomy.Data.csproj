@@ -8,9 +8,8 @@
   </PropertyGroup>
   <ItemGroup>
     
-    <PackageReference Include="VirtoCommerce.Platform.Data" Version="3.1039.12" />
-    <PackageReference Include="VirtoCommerce.Platform.Hangfire" Version="3.1039.12" />
-    <PackageReference Include="VirtoCommerce.CatalogModule.Data" Version="3.1029.6" />
+    <PackageReference Include="VirtoCommerce.Platform.Data" Version="3.1095.0" />
+    <PackageReference Include="VirtoCommerce.CatalogModule.Data" Version="3.1051.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VirtoCommerce.ShopifyTaxonomy.Core\VirtoCommerce.ShopifyTaxonomy.Core.csproj" />

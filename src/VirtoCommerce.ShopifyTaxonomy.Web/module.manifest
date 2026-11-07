@@ -4,9 +4,9 @@
   <version>3.1002.0</version>
   <version-tag></version-tag>
 
-  <platformVersion>3.1039.12</platformVersion>
+  <platformVersion>3.1095.0</platformVersion>
   <dependencies>
-      <dependency id="VirtoCommerce.Catalog" version="3.1029.6" />
+      <dependency id="VirtoCommerce.Catalog" version="3.1051.0" />
   </dependencies>
 
   <title>Shopify Taxonomy Importer</title>

@@ -1,11 +1,13 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using VirtoCommerce.Platform.Core.Jobs;
 using VirtoCommerce.Platform.Core.Modularity;
 using VirtoCommerce.Platform.Core.Settings;
 using VirtoCommerce.ShopifyTaxonomy.Core;
 using VirtoCommerce.ShopifyTaxonomy.Core.Services;
 using VirtoCommerce.ShopifyTaxonomy.Data.Services;
+using VirtoCommerce.ShopifyTaxonomy.Web.BackgroundJobs;
 
 namespace VirtoCommerce.ShopifyTaxonomy.Web;
 
@@ -17,6 +19,7 @@ public class Module : IModule, IHasConfiguration
     public void Initialize(IServiceCollection serviceCollection)
     {
         serviceCollection.AddTransient<IShopifyTaxonomyImporter, ShopifyTaxonomyImporter>();
+        serviceCollection.AddBackgroundJob<ShopifyTaxonomyImportJob>();
     }
 
     public void PostInitialize(IApplicationBuilder appBuilder)

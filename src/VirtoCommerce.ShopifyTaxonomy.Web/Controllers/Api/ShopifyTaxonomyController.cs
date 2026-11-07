@@ -1,5 +1,4 @@
 using System.Threading.Tasks;
-using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -7,10 +6,11 @@ using VirtoCommerce.CatalogModule.Core.Model.Search;
 using VirtoCommerce.CatalogModule.Core.Services;
 using VirtoCommerce.CatalogModule.Data.Authorization;
 using VirtoCommerce.Platform.Core.Common;
+using VirtoCommerce.Platform.Core.Jobs;
 using VirtoCommerce.Platform.Core.PushNotifications;
 using VirtoCommerce.Platform.Core.Security;
 using VirtoCommerce.ShopifyTaxonomy.Core.Models;
-using VirtoCommerce.ShopifyTaxonomy.Core.Services;
+using VirtoCommerce.ShopifyTaxonomy.Web.BackgroundJobs;
 using CatalogModuleConstants = VirtoCommerce.CatalogModule.Core.ModuleConstants;
 
 namespace VirtoCommerce.CatalogModule.Web.Controllers.Api
@@ -22,21 +22,18 @@ namespace VirtoCommerce.CatalogModule.Web.Controllers.Api
         private readonly ICatalogService _catalogService;
         private readonly IAuthorizationService _authorizationService;
         private readonly IUserNameResolver _userNameResolver;
-        private readonly IShopifyTaxonomyImporter _shopifyTaxonomyImporter;
         private readonly IPushNotificationManager _notifier;
 
         public ShopifyTaxonomyController(
             ICatalogService catalogService,
             IAuthorizationService authorizationService,
             IUserNameResolver userNameResolver,
-            IPushNotificationManager notifier,
-            IShopifyTaxonomyImporter shopifyTaxonomyImporter)
+            IPushNotificationManager notifier)
         {
             _catalogService = catalogService;
             _authorizationService = authorizationService;
             _userNameResolver = userNameResolver;
             _notifier = notifier;
-            _shopifyTaxonomyImporter = shopifyTaxonomyImporter;
         }
 
         [HttpPost]
@@ -79,7 +76,8 @@ namespace VirtoCommerce.CatalogModule.Web.Controllers.Api
             };
             await _notifier.SendAsync(notification);
 
-            BackgroundJob.Enqueue(() => _shopifyTaxonomyImporter.BackgroundImport(importInfo, notification));
+            // The static facade rather than an injected IBackgroundJob keeps the controller constructor unchanged.
+            await BackgroundJob.Enqueue<ShopifyTaxonomyImportJob>(new ShopifyTaxonomyImportJobPayload { Request = importInfo, Notification = notification });
 
             return Ok(notification);
         }
