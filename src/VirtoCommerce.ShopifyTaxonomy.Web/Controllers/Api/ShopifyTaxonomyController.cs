@@ -10,7 +10,6 @@ using VirtoCommerce.Platform.Core.Jobs;
 using VirtoCommerce.Platform.Core.PushNotifications;
 using VirtoCommerce.Platform.Core.Security;
 using VirtoCommerce.ShopifyTaxonomy.Core.Models;
-using VirtoCommerce.ShopifyTaxonomy.Core.Services;
 using VirtoCommerce.ShopifyTaxonomy.Web.BackgroundJobs;
 using CatalogModuleConstants = VirtoCommerce.CatalogModule.Core.ModuleConstants;
 
@@ -23,21 +22,18 @@ namespace VirtoCommerce.CatalogModule.Web.Controllers.Api
         private readonly ICatalogService _catalogService;
         private readonly IAuthorizationService _authorizationService;
         private readonly IUserNameResolver _userNameResolver;
-        private readonly IShopifyTaxonomyImporter _shopifyTaxonomyImporter;
         private readonly IPushNotificationManager _notifier;
 
         public ShopifyTaxonomyController(
             ICatalogService catalogService,
             IAuthorizationService authorizationService,
             IUserNameResolver userNameResolver,
-            IPushNotificationManager notifier,
-            IShopifyTaxonomyImporter shopifyTaxonomyImporter)
+            IPushNotificationManager notifier)
         {
             _catalogService = catalogService;
             _authorizationService = authorizationService;
             _userNameResolver = userNameResolver;
             _notifier = notifier;
-            _shopifyTaxonomyImporter = shopifyTaxonomyImporter;
         }
 
         [HttpPost]
